@@ -2,22 +2,21 @@
 #include "Mat2.h"
 #include <vector>
 #include <algorithm>
+#include "GraphicsCommon.h"
 
 class Shape
 {
 public:
 	Shape();
 	~Shape();
-	virtual Vec2& support(const Vec2& d) const
-	{
-		//Vec2* v = new Vec2(0, 0);
-		return nullVec;
-	};
-	virtual Vec2& getRandomVertex() const
-	{
-		//Vec2* v = new Vec2(0, 0);
-		return nullVec;
-	};
+	virtual void goTo(const Vec2& pos) {};
+	virtual void move(const Vec2& pos) {};
+	virtual void rotate(float theta)   {};
+
+	virtual Vec2 center()				 const  { return nullVec; };
+	virtual Vec2 support(const Vec2& d)  const	{ return nullVec; };
+	virtual Vec2 getRandomVertex()		 const	{ return nullVec; };
+	virtual void draw() const {};
 };
 
 class Simplex
@@ -26,8 +25,8 @@ public:
 	std::vector<Vec2> vertices;
 
 	// vertices of A and B that created this vertex
-	std::vector<Vec2*> verticesA;
-	std::vector<Vec2*> verticesB;
+	std::vector<Vec2> verticesA;
+	std::vector<Vec2> verticesB;
 	Simplex() {};
 	Simplex(std::vector<Vec2>& v) : vertices(v) {};
 	Vec2 conv()
@@ -69,17 +68,46 @@ public:
 		}
 		vertices.clear();
 	}
-	Vec2& getRandomVertex() const
+	Vec2 getRandomVertex() const
 	{
 		return *vertices[0];
 	};
-	Vec2& support(const Vec2& d) const;
+	Vec2 support(const Vec2& d) const;
 	Vec2 center() const;
 	float distance(const Shape& B) const;
 	void sortVertices();
+	void goTo(const Vec2& pos);
 	void move(const Vec2& pos);
 	void apply(const Mat2& mat);
 	void rotate(float theta);
+
+	void draw()
+	{
+		std::vector<Vec2> drawingVertices;
+		for (Vec2* v : vertices)
+		{
+			drawingVertices.push_back(Vec2(*v));
+		}
+		for (Vec2& v : drawingVertices)
+		{
+			v.x += WIDTH / 2;
+			v.y = HEIGHT / 2 - v.y;
+		}
+		gfx->DrawPolygon(drawingVertices, Colors::White); };
+};
+
+class Circle : public Shape
+{
+public:
+	float r;
+	Vec2 pos;
+	Circle(const Vec2& pos, float r) : pos(pos), r(r) {};
+	Vec2 center() const { return pos; };
+	Vec2 getRandomVertex() const { return Vec2(pos.x + r, pos.y); };
+	Vec2 support(const Vec2& d) const { return pos + d.GetNormalized()*r; };
+	void draw() { gfx->DrawCircle(WIDTH / 2 + pos.x, HEIGHT / 2 - pos.y, r, Colors::Yellow); };
+	void move(const Vec2& d) { pos += d; };
+	void goTo(const Vec2& d) { pos = d; };
 };
 
 namespace Geometry

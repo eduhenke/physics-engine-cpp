@@ -24,8 +24,8 @@
 #include "ChiliException.h"
 #include "Colors.h"
 #include "Vec2.h"
-#include "Shape.h"
 #include <assert.h>
+#include <vector>
 
 #define CHILI_GFX_EXCEPTION( hr,note ) Graphics::Exception( hr,note,_CRT_WIDE(__FILE__),__LINE__ )
 
@@ -56,15 +56,28 @@ public:
 	Graphics& operator=(const Graphics&) = delete;
 	void EndFrame();
 	void BeginFrame();
-	void DrawVector(const Vec2& v, Color col);
-	void DrawVector(const Vec2& v, const Vec2& c, Color col);
-	void DrawPolygon(const Poly& p, Color c)
+	Vec2 ConvertToDraw(const Vec2& v)
 	{
-		for (int i = 1; i < p.vertices.size()-1; i++)
+		return Vec2(ScreenWidth / 2 + v.x, ScreenHeight / 2 - v.y);
+	}
+	Vec2 ConvertToScene(const Vec2& v)
+	{
+		return Vec2(-(float)ScreenWidth / 2 + v.x, ScreenHeight / 2 - v.y);
+	}
+	void DrawVector(const Vec2& v, Color col);
+	void DrawVector(Vec2 v, Vec2 c, Color col);
+	void DrawPolygon(const std::vector<Vec2>& vertices, Color c)
+	{
+		for (int i = 1; i < vertices.size()-1; i++)
 		{
-			DrawTriangle(*p.vertices[0], *p.vertices[i], *p.vertices[i+1], c);
+			DrawTriangle(vertices[0], vertices[i], vertices[i+1], c);
 		}
 	};
+	void DrawCircle(const Vec2& pos, float r, Color c)
+	{
+		DrawCircle(pos.x, pos.y, r, c);
+	}
+	void DrawCircle(int x, int y, float r, Color c);
 	void DrawTriangle(const Vec2& v0, const Vec2& v1, const Vec2& v2, Color c);
 	void DrawLine(const Vec2& p1, const Vec2& p2, Color c)
 	{

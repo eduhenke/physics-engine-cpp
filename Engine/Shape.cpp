@@ -178,8 +178,8 @@ namespace Geometry
 	}
 	void closestPoints(const Shape& A, const Shape& B, Vec2& outA, Vec2& outB)
 	{
-		Vec2 &firstPointA = A.getRandomVertex(),
-			 &firstPointB = B.getRandomVertex();
+		Vec2 firstPointA = A.getRandomVertex(),
+			 firstPointB = B.getRandomVertex();
 		Vec2 v = firstPointA - firstPointB;
 		Simplex W;
 		float u = 0;
@@ -187,26 +187,40 @@ namespace Geometry
 		while (!closeEnough)
 		{
 			//Vec2 w = Geometry::SMD(*this, shp, -v);
-			Vec2& pointA = A.support(-v);
-			Vec2& pointB = B.support(v);
+			Vec2 pointA = A.support(-v);
+			Vec2 pointB = B.support(v);
 			Vec2 w = pointA - pointB;
 			float absV = v.Len();
 			float delta = v*w / absV;
 			u = std::max(u, delta);
-			closeEnough = (absV - u) <= 0.01; // epsilon was tested
+			closeEnough = (absV - u) <= 0.1; // epsilon was tested
 			if (closeEnough && W.vertices.size() == 0) // i.e. if first time fill Simplex W
 			{
 				W.vertices.push_back(w);
-				W.verticesA.push_back(&firstPointA);
-				W.verticesB.push_back(&firstPointB);
+				W.verticesA.push_back(firstPointA);
+				W.verticesB.push_back(firstPointB);
 			}
 			else if (!closeEnough)
 			{
-				if (W.vertices.size() < 3)
+				int sizeW = W.vertices.size();
+				if (sizeW < 3)
 				{
 					W.vertices.push_back(w);
-					W.verticesA.push_back(&pointA);
-					W.verticesB.push_back(&pointB);
+					W.verticesA.push_back(pointA);
+					W.verticesB.push_back(pointB);
+				}
+
+				switch (sizeW)
+				{
+				case 3:
+					// if origin in triangle
+					if (Geometry::pointInTriangle(nullVec, W.vertices[0], W.vertices[1], W.vertices[2]))
+					{
+						return;
+					}
+					break;
+				//case 2:
+					//if(sign)
 				}
 				v = W.conv();
 				W.refine();
@@ -222,10 +236,11 @@ namespace Geometry
 			W.verticesB.push_back(W.verticesB[0]);
 		}
 		float vLen = v.Len();
-		Geometry::twoLinesDistance(*W.verticesA[0], *W.verticesA[1], *W.verticesB[0], *W.verticesB[1], pointOnA, pointOnB);
+		Geometry::twoLinesDistance(W.verticesA[0], W.verticesA[1], W.verticesB[0], W.verticesB[1], pointOnA, pointOnB);
 		//gfx->DrawVector(pointOnA, pointOnB, Colors::Cyan);
 		outA = pointOnA;
 		outB = pointOnB;
+
 	}
 }
 
@@ -239,7 +254,7 @@ Shape::~Shape()
 {
 }
 
-Vec2& Poly::support(const Vec2 & d) const
+Vec2 Poly::support(const Vec2 & d) const
 {
 	return Geometry::support(d, vertices);
 }
@@ -287,12 +302,20 @@ void Poly::sortVertices()
 	}
 }
 
-void Poly::move(const Vec2 & pos)
+void Poly::goTo(const Vec2 & pos)
 {
 	Vec2 c = center();
 	for (Vec2* v : vertices)
 	{
 		*v += pos - c;
+	}
+}
+
+void Poly::move(const Vec2 & pos)
+{
+	for (Vec2* v : vertices)
+	{
+		*v += pos;
 	}
 }
 

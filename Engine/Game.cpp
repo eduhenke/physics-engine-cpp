@@ -23,6 +23,7 @@
 #include <algorithm>
 #include "Mat2.h"
 
+
 using namespace std;
 
 MainWindow* wnd;
@@ -30,9 +31,15 @@ Graphics* gfx;
 Game::Game( MainWindow& w )
 {
 	wnd = &w; gfx = new Graphics(w);
-	AllocConsole();
+	//AllocConsole();
 	freopen("CONOUT$", "w", stdout);
 	freopen("CONOUT$", "w", stderr);
+	obj1.veloc = Vec2(1, -1)/0.8;
+	obj2.veloc = Vec2(0, 1).GetNormalized()/2;
+	obj1.mass = 0.1f;
+	//obj2.veloc = Vec2(0, -1)/2;
+	c1.move(Vec2(100, 200));
+	p2.move(Vec2(10, -200));
 }
 
 void Game::Go()
@@ -45,23 +52,29 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
+	static Vec2 center(WIDTH / 2, HEIGHT / 2);
+	//obj2.shape.rotate(0.002);
+	c1.draw();
+	p2.draw();
+	obj1.handleCollision(obj2);
+	Vec2 mousePos = gfx->ConvertToScene(Vec2(wnd->mouse.GetPos()));
+	if (wnd->mouse.LeftIsPressed())
+	{
+		obj1.shape.goTo(mousePos);
+	}
+	if (wnd->mouse.RightIsPressed())
+	{
+		obj2.shape.goTo(mousePos);
+	}
 }
 
 void Game::ComposeFrame()
 {
-	gfx->DrawPolygon(p1, Colors::Cyan);
-	gfx->DrawPolygon(p2, Colors::Magenta);
-	static Vec2 center(WIDTH / 2, HEIGHT / 2);
-	Vec2 mousePos = Vec2(wnd->mouse.GetPos()).Clamp(0, 0, WIDTH, HEIGHT);
-
-	p1.rotate(0.02);
-	Poly diff = Geometry::minkowskiDiff(p1, p2);
-	diff.move(diff.center()+center);
-	gfx->DrawPolygon(diff, Colors::Green);
-	Vec2 d, f;
-	Geometry::closestPoints(p2, diff, d, f);
-	gfx->DrawVector(d, f, Colors::Red);
-	mousePos.x = max(0, min((int)WIDTH-1, wnd->mouse.GetPosX()));
-	mousePos.y = max(0, min((int)HEIGHT-1, wnd->mouse.GetPosY()));
-	p2.move(mousePos);
 }
+
+//Poly diff = Geometry::minkowskiDiff(p1, p2);
+//diff.move(center);
+//gfx->DrawPolygon(diff, Colors::Green);
+//Vec2 d, f;
+//Geometry::closestPoints(p2, diff, d, f);
+//gfx->DrawVector(d, f, Colors::Red);

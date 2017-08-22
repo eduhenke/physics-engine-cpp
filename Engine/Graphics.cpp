@@ -313,8 +313,10 @@ void Graphics::DrawVector(const Vec2& v, Color col)
 	DrawVector(v+c, c, col);
 }
 
-void Graphics::DrawVector(const Vec2& v, const Vec2& c, Color col)
+void Graphics::DrawVector(Vec2 v, Vec2 c, Color col)
 {
+	v = ConvertToDraw(v);
+	c = ConvertToDraw(c);
 	Vec2 d = (c - v).GetNormalized()*8;
 	Vec2 u = d.Rotate(-PI / 6)+v;
 	Vec2 l = d.Rotate(PI / 6)+v;
@@ -373,6 +375,20 @@ std::wstring Graphics::Exception::GetErrorDescription() const
 std::wstring Graphics::Exception::GetExceptionType() const
 {
 	return L"Chili Graphics Exception";
+}
+
+void Graphics::DrawCircle(int x, int y, float r, Color c)
+{
+	x ^ 2 + y ^ 2 <= r ^ 2;
+	float rSq = sq(r);
+	for (int dy = (int)-r; dy < (int)r; dy++)
+	{
+		int mx = (int)sqrt(rSq-sq(dy));
+		for (int dx = -mx; dx < mx; dx++)
+		{
+			PutPixel(x - dx, y - dy, c);
+		}
+	}
 }
 
 void Graphics::DrawTriangle(const Vec2& v0, const Vec2& v1, const Vec2& v2, Color c)

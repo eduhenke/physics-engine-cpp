@@ -142,9 +142,13 @@ public:
 	{
 		return _Vec2(clamp(x, lowerX, upperX), clamp(y, lowerY, upperY));
 	}
-	bool AlmostNull() const
+	bool Almost( const _Vec2& rhs ) const
 	{
-		return x < 1e-3 && y < 1e-3;
+		return Almost(rhs, 1e-3);
+	}
+	bool Almost(const _Vec2& rhs, T eps) const
+	{
+		return abs(x - rhs.x) < eps && (y - rhs.y) < eps;
 	}
 	void print() const
 	{
