@@ -34,7 +34,7 @@ Game::Game( MainWindow& w )
 	//AllocConsole();
 	freopen("CONOUT$", "w", stdout);
 	freopen("CONOUT$", "w", stderr);
-	obj1.veloc = Vec2(1, -1)/0.8;
+	obj1.veloc = Vec2(1, -1)/3.8;
 	obj2.veloc = Vec2(0, 1).GetNormalized()/2;
 	obj1.mass = 0.1f;
 	//obj2.veloc = Vec2(0, -1)/2;
@@ -54,8 +54,8 @@ void Game::UpdateModel()
 {
 	static Vec2 center(WIDTH / 2, HEIGHT / 2);
 	//obj2.shape.rotate(0.002);
-	c1.draw();
-	p2.draw();
+	obj1.shape.draw();
+	obj2.shape.draw();
 	obj1.handleCollision(obj2);
 	Vec2 mousePos = gfx->ConvertToScene(Vec2(wnd->mouse.GetPos()));
 	if (wnd->mouse.LeftIsPressed())

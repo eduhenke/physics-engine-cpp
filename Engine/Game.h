@@ -51,6 +51,6 @@ private:
 	Poly p1 = std::vector<Vec2>{ Vec2(110,120), Vec2(160,120), Vec2(170,180), Vec2(130,200), Vec2(100, 140) };
 	Poly p2 = std::vector<Vec2>{ Vec2(100,0), Vec2(200,100), Vec2(0,100) };
 	Circle c1 = Circle(Vec2(-200, -150), 30);
-	Object obj1 = Object(c1), obj2 = Object(p2);
+	Object obj1 = Object(p1), obj2 = Object(p2);
 	Vec2 c = Vec2(HEIGHT / 2, WIDTH / 2);
 };

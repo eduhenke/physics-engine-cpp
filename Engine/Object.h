@@ -9,15 +9,18 @@ class Object
 {
 public:
 	float mass = 1.0f;
-	Vec2 accel = nullVec, veloc = nullVec;
+	Vec2     accel = nullVec, veloc = nullVec;
+	float angAccel = 0.0f, angVeloc = 0.0f;
 	Shape& shape;
 	Object(Shape& shp) : shape(shp) {};
 	~Object();
 	void handleCollision(Object &const B);
 	void move()
 	{
-		veloc = veloc*FRICTION_FACTOR + accel;
+		veloc += accel;
 		shape.move(veloc);
+		angVeloc += angAccel;
+		shape.rotate(angVeloc/10000.0f);
 	}
 	Vec2 momentum()
 	{

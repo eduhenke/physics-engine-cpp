@@ -150,9 +150,14 @@ public:
 	{
 		return abs(x - rhs.x) < eps && (y - rhs.y) < eps;
 	}
-	void print() const
+	void Print() const
 	{
 		std::cout << "( " << x << ", " << y << " )" << std::endl;
+	}
+
+	float Cross(const _Vec2& rhs) const // cross product analog
+	{
+		return x*rhs.y - rhs.x*y;
 	}
 public:
 	T x;

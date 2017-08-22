@@ -81,7 +81,7 @@ public:
 	void apply(const Mat2& mat);
 	void rotate(float theta);
 
-	void draw()
+	void draw() const
 	{
 		std::vector<Vec2> drawingVertices;
 		for (Vec2* v : vertices)
@@ -93,7 +93,8 @@ public:
 			v.x += WIDTH / 2;
 			v.y = HEIGHT / 2 - v.y;
 		}
-		gfx->DrawPolygon(drawingVertices, Colors::White); };
+		gfx->DrawPolygon(drawingVertices, Colors::White); 
+	};
 };
 
 class Circle : public Shape
@@ -105,7 +106,7 @@ public:
 	Vec2 center() const { return pos; };
 	Vec2 getRandomVertex() const { return Vec2(pos.x + r, pos.y); };
 	Vec2 support(const Vec2& d) const { return pos + d.GetNormalized()*r; };
-	void draw() { gfx->DrawCircle(WIDTH / 2 + pos.x, HEIGHT / 2 - pos.y, r, Colors::Yellow); };
+	void draw() const { gfx->DrawCircle(WIDTH / 2 + pos.x, HEIGHT / 2 - pos.y, r, Colors::Yellow); };
 	void move(const Vec2& d) { pos += d; };
 	void goTo(const Vec2& d) { pos = d; };
 };
