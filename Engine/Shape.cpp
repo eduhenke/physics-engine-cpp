@@ -3,6 +3,8 @@
 #include <iostream>
 #include "GraphicsCommon.h"
 
+#define MAX_ITERS 40
+
 namespace Geometry
 {
 	Vec2& support(const Vec2 & d, std::vector<Vec2*> vertices)
@@ -184,7 +186,8 @@ namespace Geometry
 		Simplex W;
 		float u = 0;
 		bool closeEnough = false;
-		while (!closeEnough)
+		int iters = 0;
+		while (!closeEnough && iters < MAX_ITERS)
 		{
 			//Vec2 w = Geometry::SMD(*this, shp, -v);
 			Vec2 pointA = A.support(-v);
@@ -193,7 +196,8 @@ namespace Geometry
 			float absV = v.Len();
 			float delta = v*w / absV;
 			u = std::max(u, delta);
-			closeEnough = (absV - u) <= 0.1; // epsilon was tested
+			closeEnough = (absV - u) <= 0.001; // epsilon was tested
+			iters++;
 			if (closeEnough && W.vertices.size() == 0) // i.e. if first time fill Simplex W
 			{
 				W.vertices.push_back(w);
@@ -302,20 +306,23 @@ void Poly::sortVertices()
 	}
 }
 
-void Poly::goTo(const Vec2 & pos)
+
+void Poly::goTo(float x, float y)
 {
 	Vec2 c = center();
 	for (Vec2* v : vertices)
 	{
-		*v += pos - c;
+		v->x += x - c.x;
+		v->y += y - c.y;
 	}
 }
 
-void Poly::move(const Vec2 & pos)
+void Poly::move(float dx, float dy)
 {
 	for (Vec2* v : vertices)
 	{
-		*v += pos;
+		v->x += dx;
+		v->y += dy;
 	}
 }
 

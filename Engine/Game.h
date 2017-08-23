@@ -30,6 +30,9 @@
 #include <iostream>
 #include "Object.h"
 #include "GraphicsCommon.h"
+#include <time.h>
+
+using namespace std;
 
 class Game
 {
@@ -48,9 +51,17 @@ private:
 	/********************************/
 	/*  User Variables              */
 	/********************************/
-	Poly p1 = std::vector<Vec2>{ Vec2(110,120), Vec2(160,120), Vec2(170,180), Vec2(130,200), Vec2(100, 140) };
-	Poly p2 = std::vector<Vec2>{ Vec2(100,0), Vec2(200,100), Vec2(0,100) };
+	Poly p1 = { Vec2(110,120), Vec2(160,120), Vec2(170,180), Vec2(130,200), Vec2(100, 140) };
+	Poly p2 { 100.0f, 0.0f,   200.0f, 100.0f,   0.0f, 100.0f };
+	//Poly floorShape = { Vec2(-WIDTH / 2,-HEIGHT / 2 + 20), Vec2(WIDTH / 2,-HEIGHT / 2 + 20), Vec2(WIDTH / 2,-HEIGHT / 2 - 20), Vec2(-WIDTH / 2,-HEIGHT / 2 - 20) };
+	Poly floorShape = Poly(0.0f, -HEIGHT/2, WIDTH, 40.0f);
+	Poly lWallShape = Poly(-WIDTH / 2, 0, 40.0f, HEIGHT);
+	Poly rWallShape = Poly(WIDTH / 2, 0, 40.0f, HEIGHT);
+	Poly roofShape = Poly(0.0f, HEIGHT / 2, WIDTH, 40.0f);
 	Circle c1 = Circle(Vec2(-200, -150), 30);
-	Object obj1 = Object(p1), obj2 = Object(p2);
+	Object obj1 = Object(p1), obj2 = Object(p2), floor = Object(floorShape),
+		   rWall = Object(rWallShape), lWall = Object(lWallShape), roof = Object(roofShape);
+	vector<Object*> scene{ &obj1, &obj2, &floor, &rWall, &lWall, &roof, new Object(c1) };
 	Vec2 c = Vec2(HEIGHT / 2, WIDTH / 2);
+	clock_t t;
 };

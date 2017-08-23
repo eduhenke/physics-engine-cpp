@@ -12,7 +12,7 @@ Object::~Object()
 {
 }
 
-void Object::handleCollision(Object & const B)
+void Object::handleCollision(Object & const B, float dt)
 {
 	Object &const A = *this;
 	Vec2 closestA, closestB, N, distVec;
@@ -21,13 +21,15 @@ void Object::handleCollision(Object & const B)
 	distVec = closestA - closestB;
 	dist = distVec.Len();
 	N = distVec / dist; // inward, B to A
-	A.angAccel = 0.0f;
-	B.angAccel = 0.0f;
-	if (dist < std::max(10.0f, (A.veloc-B.veloc).Len()))
+	Vec2 dx = (A.veloc - B.veloc) * dt;
+	float triggerDist = std::max(2.0f, dx.Len());
+	if (dist < triggerDist)
 	{
+		A.accel = nullVec;
+		B.accel = nullVec;
 		// to avoid one shape being "stuck" inside the other
-		A.shape.move(-A.veloc);
-		B.shape.move(-B.veloc);
+		if (A.movable) A.shape.move(N * triggerDist);
+		if (B.movable) B.shape.move(-N * triggerDist);
 
 		// solve center of mass velocity
 		Vec2 Va = Physics::VelocityAfterCollision(A, B, N);
@@ -35,21 +37,19 @@ void Object::handleCollision(Object & const B)
 		A.veloc = Va;
 
 		// solve rotation
-		Vec2 F = N; // assuming the force is the normal
-		Vec2 Ra = closestA - A.shape.center();
-		float torque = Ra.Cross(F);
-		A.angAccel = torque; // missing momentum of inertia
-		Vec2 Rb = closestB - B.shape.center();
-		torque = Rb.Cross(-F);
-		B.angAccel = torque; // missing momentum of inertia
+		Vec2 F = N*(A.veloc - B.veloc).Len(); // assuming the force is the normal
+		Vec2 r = closestA - A.shape.center();
+		float torque = r.Cross(F);
+		A.angAccel = torque / A.momentOfInertia;
+		r = closestB - B.shape.center();
+		torque = r.Cross(-F);
+		B.angAccel = torque / B.momentOfInertia;
 	}
 #if COLLISION_DEBUG
 	Vec2 Ca = A.shape.center(), Cb = B.shape.center();
-	gfx->DrawVector(A.veloc * 50 + Ca, Ca, Colors::Red);
-	gfx->DrawVector(B.veloc * 50 + Cb, Cb, Colors::Red);
-	gfx->DrawVector(closestA, closestB, Colors::Gray);
+	gfx->DrawVector(A.veloc + Ca, Ca, Colors::Red);
+	gfx->DrawVector(B.veloc + Cb, Cb, Colors::Red);
+	gfx->DrawVector(closestA, closestB, Colors::Cyan);
 #endif
-	A.move();
-	B.move();
 
 }

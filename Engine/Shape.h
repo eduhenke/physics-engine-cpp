@@ -9,8 +9,10 @@ class Shape
 public:
 	Shape();
 	~Shape();
-	virtual void goTo(const Vec2& pos) {};
-	virtual void move(const Vec2& pos) {};
+	virtual void goTo(const Vec2& pos) { goTo(pos.x, pos.y); };
+	virtual void goTo(float x, float y) {};
+	virtual void move(const Vec2& pos) { move(pos.x, pos.y); };
+	virtual void move(float dx, float dy) {};
 	virtual void rotate(float theta)   {};
 
 	virtual Vec2 center()				 const  { return nullVec; };
@@ -42,6 +44,26 @@ class Poly : public Shape
 public:
 	std::vector<Vec2*> vertices;
 	Poly() {};
+	Poly(std::initializer_list<Vec2> l) : Poly(std::vector<Vec2>(l)){};
+	Poly(std::initializer_list<float> l)
+		//0.0, 0.3, 0.4, 0.5
+	{
+		int i = 0;
+		float first, second;
+		for (float num : l)
+		{
+			if (i % 2 == 0)
+			{
+				first = num;
+			}
+			else if (i % 2 == 1)
+			{
+				second = num;
+				vertices.push_back(new Vec2(first, second));
+			}
+			i++;
+		}
+	};
 	Poly(const Poly& p) 
 	{
 		vertices.reserve(p.vertices.size());
@@ -60,6 +82,14 @@ public:
 			vertices.push_back(new Vec2(vec));
 		}
 	};
+	// for constructing rectangles
+	Poly(float cx, float cy, float w, float h) :
+		Poly({
+		Vec2(cx - w/2, cy - h/2),
+		Vec2(cx - w/2, cy + h/2),
+		Vec2(cx + w/2, cy + h/2),
+		Vec2(cx + w/2, cy - h/2),
+	}) {};
 	~Poly()
 	{
 		for (std::vector< Vec2* >::iterator it = vertices.begin(); it != vertices.end(); ++it)
@@ -76,8 +106,10 @@ public:
 	Vec2 center() const;
 	float distance(const Shape& B) const;
 	void sortVertices();
-	void goTo(const Vec2& pos);
-	void move(const Vec2& pos);
+	void goTo(const Vec2& pos) { goTo(pos.x, pos.y); };
+	void goTo(float x, float y);
+	void move(const Vec2& pos) { move(pos.x, pos.y); };
+	void move(float dx, float dy);
 	void apply(const Mat2& mat);
 	void rotate(float theta);
 
@@ -107,9 +139,12 @@ public:
 	Vec2 getRandomVertex() const { return Vec2(pos.x + r, pos.y); };
 	Vec2 support(const Vec2& d) const { return pos + d.GetNormalized()*r; };
 	void draw() const { gfx->DrawCircle(WIDTH / 2 + pos.x, HEIGHT / 2 - pos.y, r, Colors::Yellow); };
-	void move(const Vec2& d) { pos += d; };
-	void goTo(const Vec2& d) { pos = d; };
+	void goTo(const Vec2& pos) { goTo(pos.x, pos.y); };
+	void goTo(float x, float y) { pos.x = x; pos.y = y; };
+	void move(const Vec2& pos) { move(pos.x, pos.y); };
+	void move(float dx, float dy) { pos.x += dx; pos.y += dy; };
 };
+
 
 namespace Geometry
 {

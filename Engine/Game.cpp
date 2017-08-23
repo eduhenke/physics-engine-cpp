@@ -34,29 +34,51 @@ Game::Game( MainWindow& w )
 	//AllocConsole();
 	freopen("CONOUT$", "w", stdout);
 	freopen("CONOUT$", "w", stderr);
-	obj1.veloc = Vec2(1, -1)/3.8;
-	obj2.veloc = Vec2(0, 1).GetNormalized()/2;
-	obj1.mass = 0.1f;
-	//obj2.veloc = Vec2(0, -1)/2;
-	c1.move(Vec2(100, 200));
-	p2.move(Vec2(10, -200));
+	obj1.veloc = Vec2(200, -100);
+	obj1.shape.move(Vec2(-300, -200));
+	obj2.shape.move(Vec2(0, -200));
+	floor.mass = 1e30;
+	floor.momentOfInertia = 1e30;
+	floor.movable = false;
+	lWall.mass = 1e30;
+	lWall.momentOfInertia = 1e30;
+	lWall.movable = false;
+	rWall.mass = 1e30;
+	rWall.momentOfInertia = 1e30;
+	rWall.movable = false;
+	roof.mass = 1e30;
+	roof.momentOfInertia = 1e30;
+	roof.movable = false;
+	t = clock();
 }
 
 void Game::Go()
 {
-	gfx->BeginFrame();	
+	gfx->BeginFrame();
+	ComposeFrame(); // 'compose frame' before 'update model', because debugging is easier
+	t = clock() - t;
 	UpdateModel();
-	ComposeFrame();
+	t = clock();
 	gfx->EndFrame();
 }
 
 void Game::UpdateModel()
 {
-	static Vec2 center(WIDTH / 2, HEIGHT / 2);
-	//obj2.shape.rotate(0.002);
-	obj1.shape.draw();
-	obj2.shape.draw();
-	obj1.handleCollision(obj2);
+	static float dt;
+	dt = (float)t / CLOCKS_PER_SEC;
+	scene.back()->accel = GRAVITY;
+	scene.back()->angAccel = 0.0f;
+	for (int i = 0; i < scene.size() - 1; i++)
+	{
+		scene[i]->accel = GRAVITY;
+		scene[i]->angAccel = 0.0f;
+		for (int j = i + 1; j < scene.size(); j++)
+		{
+			scene[i]->handleCollision(*scene[j], dt);
+		}
+		scene[i]->move(dt);
+	}
+	scene.back()->move(dt);
 	Vec2 mousePos = gfx->ConvertToScene(Vec2(wnd->mouse.GetPos()));
 	if (wnd->mouse.LeftIsPressed())
 	{
@@ -70,6 +92,10 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
+	for (Object* obj : scene)
+	{
+		obj->shape.draw();
+	}
 }
 
 //Poly diff = Geometry::minkowskiDiff(p1, p2);

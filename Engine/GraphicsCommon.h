@@ -2,8 +2,8 @@
 #include "MainWindow.h"
 #include "Graphics.h"
 
-#define HEIGHT Graphics::ScreenHeight
-#define WIDTH Graphics::ScreenWidth
+#define HEIGHT ((float)Graphics::ScreenHeight)
+#define WIDTH ((float)Graphics::ScreenWidth)
 
 extern MainWindow* wnd;
 extern Graphics* gfx;
