@@ -37,18 +37,8 @@ Game::Game( MainWindow& w )
 	obj1.veloc = Vec2(200, -100);
 	obj1.shape.move(Vec2(-300, -200));
 	obj2.shape.move(Vec2(0, -200));
-	floor.mass = 1e30;
-	floor.momentOfInertia = 1e30;
-	floor.movable = false;
-	lWall.mass = 1e30;
-	lWall.momentOfInertia = 1e30;
-	lWall.movable = false;
-	rWall.mass = 1e30;
-	rWall.momentOfInertia = 1e30;
-	rWall.movable = false;
-	roof.mass = 1e30;
-	roof.momentOfInertia = 1e30;
-	roof.movable = false;
+	obj2.mass = 5;
+	obj2.momentOfInertia *= obj2.mass;
 	t = clock();
 }
 
@@ -66,12 +56,15 @@ void Game::UpdateModel()
 {
 	static float dt;
 	dt = (float)t / CLOCKS_PER_SEC;
-	scene.back()->accel = GRAVITY;
-	scene.back()->angAccel = 0.0f;
+	for (Object* obj : scene)
+	{
+		obj->accel = GRAVITY;
+		obj->angAccel = 0.0f;
+		Vec2 C = obj->shape.center();
+		gfx->DrawVector(obj->veloc + C, C, Colors::Red);
+	}
 	for (int i = 0; i < scene.size() - 1; i++)
 	{
-		scene[i]->accel = GRAVITY;
-		scene[i]->angAccel = 0.0f;
 		for (int j = i + 1; j < scene.size(); j++)
 		{
 			scene[i]->handleCollision(*scene[j], dt);

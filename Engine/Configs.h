@@ -1,2 +1,2 @@
 #pragma once
-#define COLLISION_DEBUG FALSE
+#define COLLISION_DEBUG TRUE

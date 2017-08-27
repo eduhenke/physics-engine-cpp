@@ -95,7 +95,7 @@ public:
 
 namespace Colors
 {
-	static constexpr Color MakeRGB( unsigned char r,unsigned char g,unsigned char b )
+	static constexpr Color MakeRGB( unsigned int r,unsigned int g,unsigned int b )
 	{
 		return (r << 16u) | (g << 8u) | b;
 	}

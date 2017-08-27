@@ -16,6 +16,14 @@ public:
 	float momentOfInertia = 2e2;
 	Shape& shape;
 	Object(Shape& shp) : shape(shp) {};
+	Object(Shape& shp, bool mov) : shape(shp), movable(mov)
+	{ 
+		if (!mov)
+		{
+			mass = 1e30;
+			momentOfInertia = 1e30;
+		}
+	};
 	~Object();
 	void handleCollision(Object &const B, float dt);
 	void move(float dt)

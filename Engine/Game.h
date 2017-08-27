@@ -59,8 +59,8 @@ private:
 	Poly rWallShape = Poly(WIDTH / 2, 0, 40.0f, HEIGHT);
 	Poly roofShape = Poly(0.0f, HEIGHT / 2, WIDTH, 40.0f);
 	Circle c1 = Circle(Vec2(-200, -150), 30);
-	Object obj1 = Object(p1), obj2 = Object(p2), floor = Object(floorShape),
-		   rWall = Object(rWallShape), lWall = Object(lWallShape), roof = Object(roofShape);
+	Object obj1 = Object(p1), obj2 = Object(p2), floor = Object(floorShape, false),
+		   rWall = Object(rWallShape, false), lWall = Object(lWallShape, false), roof = Object(roofShape, false);
 	vector<Object*> scene{ &obj1, &obj2, &floor, &rWall, &lWall, &roof, new Object(c1) };
 	Vec2 c = Vec2(HEIGHT / 2, WIDTH / 2);
 	clock_t t;

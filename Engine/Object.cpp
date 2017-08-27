@@ -22,7 +22,7 @@ void Object::handleCollision(Object & const B, float dt)
 	dist = distVec.Len();
 	N = distVec / dist; // inward, B to A
 	Vec2 dx = (A.veloc - B.veloc) * dt;
-	float triggerDist = std::max(2.0f, dx.Len());
+	float triggerDist = std::max(6.0f, dx.Len());
 	if (dist < triggerDist)
 	{
 		A.accel = nullVec;
@@ -46,10 +46,10 @@ void Object::handleCollision(Object & const B, float dt)
 		B.angAccel = torque / B.momentOfInertia;
 	}
 #if COLLISION_DEBUG
-	Vec2 Ca = A.shape.center(), Cb = B.shape.center();
-	gfx->DrawVector(A.veloc + Ca, Ca, Colors::Red);
-	gfx->DrawVector(B.veloc + Cb, Cb, Colors::Red);
-	gfx->DrawVector(closestA, closestB, Colors::Cyan);
+	if (dist < 100)
+	{
+		gfx->DrawVector(closestA, closestB, Colors::Cyan);
+	}
 #endif
 
 }
